@@ -23,4 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# Supabase
+.branches
+.temp
+
+# dotenvx
 .env
+.env.keys
+.env.local
+.env.*.local
