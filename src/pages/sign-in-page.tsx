@@ -1,16 +1,25 @@
+import githubLogo from "@/assets/github-mark.svg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSignInWithOAuth } from "@/hooks/mutations/use-sign-in-with-oauth";
+import { useSignInWithPassword } from "@/hooks/mutations/use-sign-in-with-password";
 import { useState } from "react";
 import { Link } from "react-router";
-import { useSignInWithPassword } from "@/hooks/mutations/use-sign-in-with-password";
-import githubLogo from "@/assets/github-mark.svg";
-import { useSignInWithOAuth } from "@/hooks/mutations/use-sign-in-with-oauth";
+import { toast } from "sonner";
 
 export default function SignIpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate: signInWithPassword } = useSignInWithPassword();
+  const { mutate: signInWithPassword } = useSignInWithPassword({
+    onError: (error) => {
+      toast.error(error.message, {
+        position: "top-center",
+      });
+
+      setPassword("");
+    },
+  });
   const { mutate: signInWithOAuth } = useSignInWithOAuth();
 
   const handleSignInWithPasswordClick = () => {
