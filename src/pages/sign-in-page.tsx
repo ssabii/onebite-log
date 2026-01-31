@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSignInWithOAuth } from "@/hooks/mutations/use-sign-in-with-oauth";
 import { useSignInWithPassword } from "@/hooks/mutations/use-sign-in-with-password";
+import { generateErrorMessage } from "@/lib/error";
 import { useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
@@ -11,16 +12,26 @@ export default function SignIpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate: signInWithPassword } = useSignInWithPassword({
-    onError: (error) => {
-      toast.error(error.message, {
-        position: "top-center",
-      });
+  const { mutate: signInWithPassword, isPending: isSignInWithPasswordPending } =
+    useSignInWithPassword({
+      onError: (error) => {
+        const message = generateErrorMessage(error);
+        toast.error(message, {
+          position: "top-center",
+        });
 
-      setPassword("");
-    },
-  });
-  const { mutate: signInWithOAuth } = useSignInWithOAuth();
+        setPassword("");
+      },
+    });
+  const { mutate: signInWithOAuth, isPending: isSignInWithOAuthPending } =
+    useSignInWithOAuth({
+      onError: (error) => {
+        const message = generateErrorMessage(error);
+        toast.error(message, {
+          position: "top-center",
+        });
+      },
+    });
 
   const handleSignInWithPasswordClick = () => {
     if (email.trim() === "") return;
@@ -36,11 +47,14 @@ export default function SignIpPage() {
     signInWithOAuth("github");
   };
 
+  const isPending = isSignInWithPasswordPending || isSignInWithOAuthPending;
+
   return (
     <div className="flex flex-col gap-8">
       <div className="text-xl font-bold">로그인</div>
       <div className="flex flex-col gap-2">
         <Input
+          disabled={isPending}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="py-6"
@@ -48,6 +62,7 @@ export default function SignIpPage() {
           placeholder="example@abc.com"
         />
         <Input
+          disabled={isPending}
           className="py-6"
           type="password"
           placeholder="password"
@@ -56,10 +71,15 @@ export default function SignIpPage() {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Button className="w-full" onClick={handleSignInWithPasswordClick}>
+        <Button
+          className="w-full"
+          onClick={handleSignInWithPasswordClick}
+          disabled={isPending}
+        >
           로그인
         </Button>
         <Button
+          disabled={isPending}
           className="w-full"
           variant="outline"
           onClick={handleSignInWithGithubClick}
