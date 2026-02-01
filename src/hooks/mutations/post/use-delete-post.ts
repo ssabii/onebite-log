@@ -1,9 +1,12 @@
 import { deleteImagesInPath } from "@/api/image";
 import { deletePost } from "@/api/post";
+import { QUERY_KEYS } from "@/lib/constants";
 import type { UseMutationCallback } from "@/types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useDeletePost(callbacks?: UseMutationCallback) {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: deletePost,
     ...callbacks,
@@ -14,6 +17,10 @@ export function useDeletePost(callbacks?: UseMutationCallback) {
         const path = `${deletedPost.author_id}/${deletedPost.id}`;
         await deleteImagesInPath(path);
       }
+
+      queryClient.resetQueries({
+        queryKey: QUERY_KEYS.post.list,
+      });
     },
   });
 }

@@ -79,7 +79,17 @@ export default function PostEditorModal() {
       setImages([]);
     }
 
-    textareaRef.current?.focus();
+    const timer = setTimeout(() => {
+      if (textareaRef.current) {
+        const textarea = textareaRef.current;
+        const length = editorContent.length;
+
+        textarea.focus();
+        textarea.setSelectionRange(length, length);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [isOpen, editorType, editorContent]);
 
   useEffect(() => {
