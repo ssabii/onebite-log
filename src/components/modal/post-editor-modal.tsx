@@ -49,15 +49,21 @@ export default function PostEditorModal() {
 
   useEffect(() => {
     if (!isOpen) {
-      images.forEach((image) => {
-        URL.revokeObjectURL(image.previewUrl);
-      });
       return;
     }
+
     textareaRef.current?.focus();
     setContent("");
     setImages([]);
-  }, [images, isOpen]);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      images.forEach((image) => {
+        URL.revokeObjectURL(image.previewUrl);
+      });
+    }
+  }, [isOpen, images]);
 
   const handleCloseModal = () => {
     if (content !== "" || images.length !== 0) {
